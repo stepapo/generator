@@ -27,7 +27,7 @@ $name = $options['name'];
 $module = $options['module'] ?? null;
 
 (new Generator($appNamespace, __DIR__ . '/../' . $appDir))
-	->createPresenter($name, $module, $basePresenter, $baseTemplate);
+	->createPresenter($name, $module);
 ```
 
 ### Component
