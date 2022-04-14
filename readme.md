@@ -7,18 +7,11 @@ Tool for generating empty Nette Presenters, Components and Services with basic s
 ### Presenter
 
 ```php
-<?php
-
-require __DIR__ . '/../vendor/autoload.php';
-
-use Stepapo\Generator\Generator;
-use Nette\Bridges\ApplicationLatte\Template;
-
 $options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:']);
 
-$generator = new Generator(
-	appNamespace: $options['rootNamespace'] ?? 'App',
-	appDir: __DIR__ . '/../' . ($options['rootPath'] ?? 'app'),
+$generator = new Stepapo\Generator\Generator(
+	appNamespace: $options['appNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['appDir'] ?? 'app'),
 );
 
 $generator->createPresenter(
@@ -30,82 +23,52 @@ $generator->createPresenter(
 ### Component
 
 ```php
-<?php
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:', 'entityName:', 'withTemplateName:']);
 
-require __DIR__ . '/../vendor/autoload.php';
+$generator = new Stepapo\Generator\Generator(
+	appNamespace: $options['appNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['appDir'] ?? 'app'),
+);
 
-use Stepapo\Generator\Generator;
-
-$options = getopt(null, [
-	'appNamespace:',
-	'appDir:',
-	'name:',
-	'module:',
-	'entityName:',
-	'withTemplateName:'
-]);
-
-$appNamespace = $options['rootNamespace'] ?? 'App';
-$appDir = $options['rootPath'] ?? 'app';
-$name = $options['name'];
-$module = $options['module'] ?? null;
-$entityName = $options['entityName'] ?? null;
-$withTemplateName = $options['withTemplateName'] ?? false;
-
-(new Generator($appNamespace, __DIR__ . '/../' . $appDir))
-	->createComponent($name, $module, $entityName, $withTemplateName);
+$generator->createComponent(
+	name: $options['name'], 
+	module: $options['module'] ?? null, 
+	entityName: $options['entityName'] ?? null, 
+	withTemplateName: $options['withTemplateName'] ?? false,
+);
 ```
 
 ### Model
 
 ```php
-<?php
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:', 'withConventions:']);
 
-require __DIR__ . '/../vendor/autoload.php';
+$generator = new Stepapo\Generator\Generator(
+	appNamespace: $options['appNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['appDir'] ?? 'app'),
+);
 
-use Stepapo\Generator\Generator;
-
-$options = getopt(null, [
-	'appNamespace:',
-	'appDir:',
-	'name:',
-	'module:',
-	'withConventions:',
-]);
-
-$appNamespace = $options['rootNamespace'] ?? 'App';
-$appDir = $options['rootPath'] ?? 'app';
-$name = $options['name'];
-$module = $options['module'] ?? null;
-$withConventions = $options['withConventions'] ?? false;
-
-(new Generator($appNamespace, __DIR__ . '/../' . $appDir))
-	->createModel($name, $module, $withConventions);
+$generator->createModel(
+	name: $options['name'], 
+	module: $options['module'] ?? null, 
+	withConventions: $options['withConventions'] ?? false,
+);
 ```
 
 ### Service
 
 ```php
-<?php
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:']);
 
-require __DIR__ . '/../vendor/autoload.php';
+$generator = new Stepapo\Generator\Generator(
+	appNamespace: $options['appNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['appDir'] ?? 'app'),
+);
 
-use Stepapo\Generator\Generator;
-
-$options = getopt(null, [
-	'appNamespace:',
-	'appDir:',
-	'name:',
-	'module:'
-]);
-
-$appNamespace = $options['rootNamespace'] ?? 'App';
-$appDir = $options['rootPath'] ?? 'app';
-$name = $options['name'];
-$module = $options['module'] ?? null;
-
-(new Generator($appNamespace, __DIR__ . '/../' . $appDir))
-	->createService($name, $module);
+$generator->createService(
+	name: $options['name'],
+	module: $options['module'] ?? null,
+);
 ```
 
 
