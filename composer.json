@@ -1,0 +1,28 @@
+{
+	"name": "stepapo/dataset",
+	"type": "library",
+	"description": "Library that generates empty Nette Presenters, Components and Services with basic structure and Nextras ORM model files.",
+	"keywords": ["nette", "nextras", "presenter", "component", "model", "service"],
+	"homepage": "https://github.com/stepapo/generator",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Štěpán Postler"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/stepapo/generator/issues"
+	},
+	"require": {
+		"php": ">=8.0",
+		"nette/application": "^3.1",
+		"nette/php-generator": "^4.0",
+		"nette/utils": "^3.1",
+		"nextras/orm": "^4.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Stepapo\\Generator\\": "src/"
+		}
+	}
+}
