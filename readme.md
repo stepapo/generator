@@ -1,6 +1,6 @@
 # Generator
 
-Tool for generating empty Nette Presenters, Components and Services with basic structure and Nextras ORM model files.
+Tool for generating empty Nette Presenters, Components and Nextras ORM model files with basic structure.
 
 ## Usage
 
