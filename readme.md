@@ -14,20 +14,17 @@ require __DIR__ . '/../vendor/autoload.php';
 use Stepapo\Generator\Generator;
 use Nette\Bridges\ApplicationLatte\Template;
 
-$options = getopt(null, [
-	'appNamespace:',
-	'appDir:',
-	'name:',
-	'module:',
-]);
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:']);
 
-$appNamespace = $options['rootNamespace'] ?? 'App';
-$appDir = $options['rootPath'] ?? 'app';
-$name = $options['name'];
-$module = $options['module'] ?? null;
+$generator = new Generator(
+	appNamespace: $options['rootNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['rootPath'] ?? 'app'),
+);
 
-(new Generator($appNamespace, __DIR__ . '/../' . $appDir))
-	->createPresenter($name, $module);
+$generator->createPresenter(
+	name: $options['name'],
+	module: $options['module'] ?? null,
+);
 ```
 
 ### Component
@@ -37,7 +34,6 @@ $module = $options['module'] ?? null;
 
 require __DIR__ . '/../vendor/autoload.php';
 
-use App\Bootstrap;
 use Stepapo\Generator\Generator;
 
 $options = getopt(null, [
