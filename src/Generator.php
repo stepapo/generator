@@ -132,7 +132,7 @@ class Generator
 			);
 		}
 
-		$modelPath = $basePath . "/Orm.php";
+		$modelPath = "{$this->appDir}/Model/Orm.php";
 
 		FileSystem::write(
 			$modelPath,
@@ -148,6 +148,7 @@ class Generator
 		$generator = new ServiceGenerator(
 			name: $name,
 			appNamespace: $this->appNamespace,
+			module: $module
 		);
 		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Lib";
 
