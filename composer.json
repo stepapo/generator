@@ -1,5 +1,5 @@
 {
-	"name": "stepapo/dataset",
+	"name": "stepapo/generator",
 	"type": "library",
 	"description": "Library that generates empty Nette Presenters, Components and Services with basic structure and Nextras ORM model files.",
 	"keywords": ["nette", "nextras", "presenter", "component", "model", "service"],
