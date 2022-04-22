@@ -35,6 +35,7 @@ $generator->createComponent(
 	module: $options['module'] ?? null, 
 	entityName: $options['entityName'] ?? null, 
 	withTemplateName: $options['withTemplateName'] ?? false,
+	type: $type = $options['type'] ?? null,
 );
 ```
 
