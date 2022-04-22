@@ -23,7 +23,7 @@ $generator->createPresenter(
 ### Component
 
 ```php
-$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:', 'entityName:', 'withTemplateName:']);
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:', 'type:', 'entityName:', 'withTemplateName:']);
 
 $generator = new Stepapo\Generator\Generator(
 	appNamespace: $options['appNamespace'] ?? 'App',
@@ -35,7 +35,7 @@ $generator->createComponent(
 	module: $options['module'] ?? null, 
 	entityName: $options['entityName'] ?? null, 
 	withTemplateName: $options['withTemplateName'] ?? false,
-	type: $type = $options['type'] ?? null,
+	type: $options['type'] ?? null,
 );
 ```
 
