@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace Stepapo\Generator;
 
+use App\Model\Activity\Activity;
+use Nette\Application\UI\Form;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
+use Nette\Utils\ArrayHash;
 use Nette\Utils\Strings;
+use Stepapo\Dataset\UI\Dataset\Dataset;
+use Stepapo\Menu\UI\Menu;
 
 
 class ComponentGenerator
 {
+	public const TYPE_FORM = 'form';
+	public const TYPE_DATASET = 'dataset';
+	public const TYPE_MENU = 'menu';
+
 	private string $lname;
 	private string $namespace;
 	private string $lentityName;
@@ -26,6 +35,8 @@ class ComponentGenerator
 		private ?string $module = null,
 		private ?string $entityName = null,
 		private bool $withTemplateName = false,
+		private ?string $type = null,
+		private ?string $factory = null,
 	) {
 		if ($this->entityName) {
 			$this->lentityName = lcfirst($this->entityName);
@@ -92,6 +103,30 @@ class ComponentGenerator
 				->setType('string');
 		}
 
+		if ($this->type) {
+			if ($this->factory) {
+				$constructMethod
+					->addPromotedParameter($this->type . 'Factory')
+					->setPrivate()
+					->setType($this->factory);
+				$namespace->addUse($this->factory);
+			}
+			switch ($this->type) {
+				case self::TYPE_FORM:
+					$this->createFormMethods($namespace, $class);
+					break;
+				case self::TYPE_DATASET:
+					$this->createDatasetMethods($namespace, $class);
+					break;
+				case self::TYPE_MENU:
+					$this->createMenuMethods($namespace, $class);
+					break;
+				default:
+					$this->createComponentMethods($namespace, $class);
+					break;
+			}
+		}
+
 		$renderMethod->addBody("\$this->template->setFile(__DIR__ . '/" . ($this->withTemplateName ? "' . \$this->templateName . '" : $this->lname) . ".latte');");
 
 		$file = (new PhpFile)->setStrictTypes();
@@ -134,9 +169,127 @@ class ComponentGenerator
 
 	public function generateLatte(): string
 	{
-		return <<<EOT
+		$latte = <<<EOT
 {templateType {$this->namespace}\\{$this->name}Template}
 
+
 EOT;
+		if ($this->type) {
+			$latte .= <<<EOT
+{control {$this->type}}
+
+EOT;
+		}
+
+		return $latte;
+	}
+
+
+	public function generateDatasetNeon(): string
+	{
+		return <<<EOT
+collection: %collection%
+repository: %repository%
+columns:
+
+EOT;
+	}
+
+
+	public function generateMenuNeon(): string
+	{
+		return <<<EOT
+buttons:
+
+EOT;
+	}
+
+
+	private function createFormMethods(PhpNamespace $namespace, ClassType $class): void
+	{
+		$createComponentMethod = (new Method('createComponentForm'))
+			->setPublic()
+			->setReturnType(Form::class)
+			->addBody(
+				$this->factory
+					? "\$form = \$this->{$this->type}Factory->create();"
+					: "\$form = new Form;"
+			)
+			->addBody("\$form->onSuccess[] = [\$this, 'formSucceeded'];")
+			->addBody("return \$form;");
+
+		$formSucceededMethod = (new Method('formSucceeded'))
+			->setPublic()
+			->setReturnType('void');
+		$formSucceededMethod->addParameter('form')->setType(Form::class);
+		$formSucceededMethod->addParameter('values')->setType(ArrayHash::class);
+
+		$class
+			->addMember($createComponentMethod)
+			->addMember($formSucceededMethod);
+		$namespace
+			->addUse(Form::class)
+			->addUse(ArrayHash::class);
+	}
+
+
+	private function createDatasetMethods(PhpNamespace $namespace, ClassType $class): void
+	{
+		$factoryBody = <<<EOT
+	__DIR__ . '/activityDataset.neon',
+	[
+		'collection' => '',
+		'repository' => '',
+	],
+EOT;
+
+		$createComponentMethod = (new Method('createComponentDataset'))
+			->setPublic()
+			->setReturnType(Dataset::class)
+			->addBody(
+				$this->factory
+					? "\$dataset = \$this->{$this->type}Factory->create(\n{$factoryBody}\n);"
+					: "\$dataset = Dataset::createFromNeon(\n{$factoryBody}\n);"
+			)
+			->addBody("return \$dataset;");
+
+		$class
+			->addMember($createComponentMethod);
+		$namespace->addUse(Dataset::class);
+	}
+
+
+	private function createMenuMethods(PhpNamespace $namespace, ClassType $class): void
+	{
+		$factoryBody = "__DIR__ . '/activityDataset.neon'";
+		$createComponentMethod = (new Method('createComponentMenu'))
+			->setPublic()
+			->setReturnType(Menu::class)
+			->addBody(
+				$this->factory
+					? "\$menu = \$this->{$this->type}Factory->create({$factoryBody});"
+					: "\$menu = Menu::createFromNeon({$factoryBody});"
+			)
+			->addBody("return \$menu;");
+
+		$class
+			->addMember($createComponentMethod);
+		$namespace->addUse(Menu::class);
+	}
+
+
+	private function createComponentMethods(PhpNamespace $namespace, ClassType $class): void
+	{
+		$createComponentMethod = (new Method('createComponent' . ucfirst($this->type)))
+			->setPublic()
+			->addBody(
+				$this->factory
+					? "\${$this->type} = \$this->{$this->type}Factory->create();"
+					: "\${$this->type} = new " . ucfirst($this->type) . ";"
+			)
+			->addBody("return \${$this->type};");
+
+		$class
+			->addMember($createComponentMethod);
 	}
 }

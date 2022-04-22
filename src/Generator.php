@@ -58,6 +58,8 @@ class Generator
 		?string $module = null,
 		?string $entityName = null,
 		bool $withTemplateName = false,
+		string $type = null,
+		string $factory = null,
 		string $baseControl = Control::class,
 		string $baseTemplate = Template::class,
 	) {
@@ -67,6 +69,8 @@ class Generator
 			module: $module,
 			entityName: $entityName,
 			withTemplateName: $withTemplateName,
+			type: $type,
+			factory: $factory,
 		);
 		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Control";
 
@@ -91,6 +95,20 @@ class Generator
 			$basePath . "/$name/{$lname}.latte",
 			$generator->generateLatte(),
 		);
+		
+		if ($type === ComponentGenerator::TYPE_DATASET) {
+			FileSystem::write(
+				$basePath . "/$name/{$lname}.neon",
+				$generator->generateDatasetNeon(),
+			);
+		}
+
+		if ($type === ComponentGenerator::TYPE_MENU) {
+			FileSystem::write(
+				$basePath . "/$name/{$lname}.neon",
+				$generator->generateMenuNeon(),
+			);
+		}
 	}
 
 
