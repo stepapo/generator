@@ -127,7 +127,7 @@ class ComponentGenerator
 			}
 		}
 
-		$renderMethod->addBody("\$this->template->setFile(__DIR__ . '/" . ($this->withTemplateName ? "' . \$this->templateName . '" : $this->lname) . ".latte');");
+		$renderMethod->addBody("\$this->template->render(__DIR__ . '/" . ($this->withTemplateName ? "' . \$this->templateName . '" : $this->lname) . ".latte');");
 
 		$file = (new PhpFile)->setStrictTypes();
 		$file->addNamespace($namespace);
