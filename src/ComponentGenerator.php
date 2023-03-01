@@ -236,7 +236,7 @@ EOT;
 	private function createDatasetMethods(PhpNamespace $namespace, ClassType $class): void
 	{
 		$factoryBody = <<<EOT
-	__DIR__ . '/activityDataset.neon',
+	__DIR__ . '/{$this->lname}.neon',
 	[
 		'collection' => '',
 		'repository' => '',
@@ -261,7 +261,7 @@ EOT;
 
 	private function createMenuMethods(PhpNamespace $namespace, ClassType $class): void
 	{
-		$factoryBody = "__DIR__ . '/activityDataset.neon'";
+		$factoryBody = "__DIR__ . '/{$this->lname}.neon'";
 		$createComponentMethod = (new Method('createComponentMenu'))
 			->setPublic()
 			->setReturnType(Menu::class)
