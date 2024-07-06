@@ -13,7 +13,7 @@ use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\Utils\ArrayHash;
 use Nette\Utils\Strings;
-use Stepapo\Dataset\UI\Dataset\Dataset;
+use Stepapo\Dataset\Control\Dataset\DatasetControl;
 use Stepapo\Menu\UI\Menu;
 
 
@@ -245,7 +245,7 @@ EOT;
 
 		$createComponentMethod = (new Method('createComponentDataset'))
 			->setPublic()
-			->setReturnType(Dataset::class)
+			->setReturnType(DatasetControl::class)
 			->addBody(
 				$this->factory
 					? "\$dataset = \$this->{$this->type}Factory->create(\n{$factoryBody}\n);"
@@ -255,7 +255,7 @@ EOT;
 
 		$class
 			->addMember($createComponentMethod);
-		$namespace->addUse(Dataset::class);
+		$namespace->addUse(DatasetControl::class);
 	}
 
 
