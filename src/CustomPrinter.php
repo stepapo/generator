@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Stepapo\Generator;
 
-use Nette\PhpGenerator\Helpers;
-use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
-use Nette\Utils\Strings;
 
 
 class CustomPrinter extends Printer

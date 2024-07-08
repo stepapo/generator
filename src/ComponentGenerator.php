@@ -12,7 +12,6 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\Utils\ArrayHash;
-use Nette\Utils\Strings;
 use Stepapo\Dataset\Control\Dataset\DatasetControl;
 use Stepapo\Menu\UI\Menu;
 
