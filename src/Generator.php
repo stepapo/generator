@@ -7,14 +7,22 @@ namespace Stepapo\Generator;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
 use Nette\Bridges\ApplicationLatte\Template;
+use Nette\PhpGenerator\PhpFile;
 use Nette\Utils\FileSystem;
+use Nextras\Dbal\Platforms\Data\ForeignKey;
 use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Mapper\Mapper;
 use Nextras\Orm\Repository\Repository;
+use Stepapo\Definition\Config\Foreign;
+use Stepapo\Definition\Config\Table;
 
 
 class Generator
 {
+	public const string MODE_ADD = 'add';
+	public const string MODE_REMOVE = 'remove';
+
+
 	public function __construct(
 		private string $appNamespace = 'App',
 		private string $appDir = 'app',
@@ -32,24 +40,17 @@ class Generator
 			appNamespace: $this->appNamespace,
 			module: $module,
 		);
-		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Presenter";
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Template.php",
-			(new CustomPrinter())->printFile($generator->generateTemplate($baseTemplate)),
-		);
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Presenter.php",
-			(new CustomPrinter())->printFile($generator->generatePresenter($basePresenter)),
-		);
-
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Presenter";
 		$lname = lcfirst($name);
+		$this->createFile("$basePath/$name/{$name}Template.php", $generator->generateTemplate($baseTemplate));
+		$this->createFile("$basePath/$name/{$name}Presenter.php", $generator->generatePresenter($basePresenter));
+		$this->createFile("$basePath/$name/$lname.latte", $generator->generateLatte());
+	}
 
-		FileSystem::write(
-			$basePath . "/$name/{$lname}.latte",
-			$generator->generateLatte(),
-		);
+
+	public function removePresenter(string $name, ?string $module)
+	{
+		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Presenter/$name");
 	}
 
 
@@ -72,43 +73,24 @@ class Generator
 			type: $type,
 			factory: $factory,
 		);
-		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Control";
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Template.php",
-			(new CustomPrinter())->printFile($generator->generateTemplate($baseTemplate)),
-		);
-
-		FileSystem::write(
-			$basePath . "/$name/I{$name}Control.php",
-			(new CustomPrinter())->printFile($generator->generateFactory()),
-		);
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Control.php",
-			(new CustomPrinter())->printFile($generator->generateControl($baseControl)),
-		);
-
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Control";
 		$lname = lcfirst($name);
-
-		FileSystem::write(
-			$basePath . "/$name/{$lname}.latte",
-			$generator->generateLatte(),
-		);
-		
+		$this->createFile("$basePath/$name/{$name}Template.php", $generator->generateTemplate($baseTemplate));
+		$this->createFile("$basePath/$name/I{$name}Control.php", $generator->generateFactory());
+		$this->createFile("$basePath/$name/{$name}Control.php", $generator->generateControl($baseControl));
+		$this->createFile("$basePath/$name/$lname.latte", $generator->generateLatte());
 		if ($type === ComponentGenerator::TYPE_DATASET) {
-			FileSystem::write(
-				$basePath . "/$name/{$lname}.neon",
-				$generator->generateDatasetNeon(),
-			);
+			$this->createFile("$basePath/$name/$lname.neon", $generator->generateDatasetNeon());
 		}
-
 		if ($type === ComponentGenerator::TYPE_MENU) {
-			FileSystem::write(
-				$basePath . "/$name/{$lname}.neon",
-				$generator->generateMenuNeon(),
-			);
+			$this->createFile("$basePath/$name/$lname.neon", $generator->generateMenuNeon());
 		}
+	}
+
+
+	public function removeComponent(string $name, ?string $module)
+	{
+		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Control/$name");
 	}
 
 
@@ -126,36 +108,85 @@ class Generator
 			module: $module,
 			withConventions: $withConventions
 		);
-		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Model";
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}.php",
-			(new CustomPrinter())->printFile($generator->generateEntity($baseEntity)),
-		);
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Mapper.php",
-			(new CustomPrinter())->printFile($generator->generateMapper($baseMapper)),
-		);
-
-		FileSystem::write(
-			$basePath . "/$name/{$name}Repository.php",
-			(new CustomPrinter())->printFile($generator->generateRepository($baseRepository)),
-		);
-
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$this->createFile("$basePath/$name/$name.php", $generator->generateEntity($baseEntity));
+		$this->createFile("$basePath/$name/{$name}Mapper.php", $generator->generateMapper($baseMapper));
+		$this->createFile("$basePath/$name/{$name}Repository.php", $generator->generateRepository($baseRepository));
 		if ($withConventions) {
-			FileSystem::write(
-				$basePath . "/$name/{$name}Conventions.php",
-				(new CustomPrinter())->printFile($generator->generateConventions()),
-			);
+			$this->createFile("$basePath/$name/{$name}Conventions.php", $generator->generateConventions());
 		}
+		$modelPath = "$this->appDir/Model/Orm.php";
+		$this->createFile($modelPath, $generator->generateUpdatedModel($modelPath));
+	}
 
-		$modelPath = "{$this->appDir}/Model/Orm.php";
 
-		FileSystem::write(
-			$modelPath,
-			(new CustomPrinter())->printFile($generator->generateUpdatedModel($modelPath)),
+	public function removeModel(string $name, ?string $module)
+	{
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+			mode: Generator::MODE_REMOVE,
 		);
+		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Model/$name");
+		$modelPath = "$this->appDir/Model/Orm.php";
+		$this->createFile($modelPath, $generator->generateUpdatedModel($modelPath));
+	}
+
+
+	public function updateEntity(Table $table, ?string $module = null)
+	{
+		$name = $table->getPhpName();
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$entityPath = "$basePath/$name/$name.php";
+		$this->createFile($entityPath, $generator->generateEntityProperties($entityPath, $table));
+	}
+
+
+	public function updateEntityManyHasMany(Foreign $from, Foreign $to, bool $isMain = false, ?string $module = null)
+	{
+		$name = $from->getPhpTable();
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$entityPath = "$basePath/$name/$name.php";
+		$this->createFile($entityPath, $generator->generateEntityPropertyManyHasMany($entityPath, $from, $to, $isMain));
+	}
+
+
+	public function updateEntityOneHasMany(Table $table, Foreign $foreign, ?string $module = null)
+	{
+		$name = $foreign->getPhpTable();
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$entityPath = "$basePath/$name/$name.php";
+		$this->createFile($entityPath, $generator->generateEntityPropertyOneHasMany($entityPath, $table, $foreign));
+	}
+
+
+	public function updateEntitySortComments(Table $table, ?string $module = null)
+	{
+		$name = $table->getPhpName();
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$entityPath = "$basePath/$name/$name.php";
+		$this->createFile($entityPath, $generator->sortEntityProperties($entityPath));
 	}
 
 
@@ -168,11 +199,19 @@ class Generator
 			appNamespace: $this->appNamespace,
 			module: $module
 		);
-		$basePath = "{$this->appDir}/" . ($module ? "Module/{$module}/" : '') . "Lib";
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Lib";
+		$this->createFile("$basePath/{$name}.php", $generator->generateService());
+	}
 
-		FileSystem::write(
-			$basePath . "/{$name}.php",
-			(new CustomPrinter())->printFile($generator->generateService()),
-		);
+
+	public function removeService(string $name, ?string $module)
+	{
+		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Lib/$name.php");
+	}
+
+
+	protected function createFile(string $path, PhpFile|string|null $file = null): void
+	{
+		FileSystem::write($path, $file instanceof PhpFile ? (new CustomPrinter())->printFile($file) : (string) $file, mode: null);
 	}
 }
