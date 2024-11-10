@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Stepapo\Generator;
 
+use Nette\InvalidArgumentException;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
@@ -13,8 +14,8 @@ use Nextras\Dbal\Utils\DateTimeImmutable;
 use Nextras\Orm\Relationships\ManyHasMany;
 use Nextras\Orm\Relationships\OneHasMany;
 use Nextras\Orm\StorageReflection\StringHelper;
-use Stepapo\Definition\Config\Foreign;
-use Stepapo\Definition\Config\Table;
+use Stepapo\Model\Definition\Config\Foreign;
+use Stepapo\Model\Definition\Config\Table;
 use Tracy\Dumper;
 use Webovac\Generator\CmsGenerator;
 
@@ -42,8 +43,7 @@ class ModelGenerator
 	public function generateEntity(string $base, ?Table $table = null): PhpFile
 	{
 		$class = (new ClassType("{$this->name}"))
-			->setExtends($base)
-			->addComment("@property int \$id {primary}");
+			->setExtends($base);
 		$namespace = (new PhpNamespace($this->namespace))
 			->addUse($base)
 			->add($class);
@@ -172,7 +172,10 @@ EOT
 
 	public function generateEntityProperties(string $path, Table $table): PhpFile
 	{
-		$file = PhpFile::fromCode(@file_get_contents($path));
+		if (!($content = @file_get_contents($path))) {
+			throw new InvalidArgumentException("Model with name '$this->name' does not exist.");
+		}
+		$file = PhpFile::fromCode($content);
 		/** @var PhpNamespace $namespace */
 		$namespace = Arrays::first($file->getNamespaces());
 		/** @var ClassType $class */
@@ -287,12 +290,14 @@ EOT
 				$c['1:m'][] = $comment;
 			} elseif (str_contains($comment, 'm:m')) {
 				$c['m:m'][] = $comment;
-			} else {
+			} elseif (str_contains($comment, '@property')) {
 				$c['simple'][] = $comment;
+			} else {
+				$c['other'][] = $comment;
 			}
 		}
 		$comments = [];
-		foreach (['primary', 'simple', 'date', 'm:1', '1:m', 'm:m'] as $type) {
+		foreach (['primary', 'simple', 'date', 'm:1', '1:m', 'm:m', 'other'] as $type) {
 			if (isset($c[$type])) {
 				sort($c[$type]);
 				$comments = $comments ? array_merge($comments, [''], $c[$type]) : $c[$type];

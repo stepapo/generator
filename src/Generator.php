@@ -13,8 +13,8 @@ use Nextras\Dbal\Platforms\Data\ForeignKey;
 use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Mapper\Mapper;
 use Nextras\Orm\Repository\Repository;
-use Stepapo\Definition\Config\Foreign;
-use Stepapo\Definition\Config\Table;
+use Stepapo\Model\Definition\Config\Foreign;
+use Stepapo\Model\Definition\Config\Table;
 
 
 class Generator

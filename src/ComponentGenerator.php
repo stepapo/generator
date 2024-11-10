@@ -14,6 +14,7 @@ use Nette\PhpGenerator\PhpNamespace;
 use Nette\Utils\ArrayHash;
 use Stepapo\Dataset\Control\Dataset\DatasetControl;
 use Stepapo\Menu\UI\Menu;
+use Stepapo\Utils\Factory;
 
 
 class ComponentGenerator
@@ -141,6 +142,7 @@ class ComponentGenerator
 			->setReturnType("{$this->namespace}\\{$this->name}Control");
 
 		$class = (new InterfaceType("I{$this->name}Control"))
+			->setExtends(Factory::class)
 			->addMember($createMethod);
 
 		$namespace = (new PhpNamespace($this->namespace))

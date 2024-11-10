@@ -8,6 +8,7 @@ use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
+use Stepapo\Utils\Service;
 
 
 class ServiceGenerator
@@ -27,6 +28,7 @@ class ServiceGenerator
 	public function generateService(): PhpFile
 	{
 		$class = (new ClassType("{$this->name}"))
+			->addImplement(Service::class)
 			->addMember((new Method('__construct'))->setPublic());
 
 		$namespace = (new PhpNamespace("{$this->namespace}"))
