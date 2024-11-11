@@ -170,6 +170,18 @@ EOT
 	}
 
 
+	public function getEntityComments(string $path, Table $table): ?string
+	{
+		if (!($content = @file_get_contents($path))) {
+			throw new InvalidArgumentException("Model with name '$this->name' does not exist.");
+		}
+		$file = PhpFile::fromCode($content);
+		/** @var ClassType $class */
+		$class = Arrays::first($file->getClasses());
+		return $class->getComment();
+	}
+
+
 	public function generateEntityProperties(string $path, Table $table): PhpFile
 	{
 		if (!($content = @file_get_contents($path))) {

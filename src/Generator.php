@@ -24,8 +24,8 @@ class Generator
 
 
 	public function __construct(
-		private string $appNamespace = 'App',
-		private string $appDir = 'app',
+		protected string $appNamespace = 'App',
+		protected string $appDir = 'app',
 	) {}
 
 
@@ -131,6 +131,20 @@ class Generator
 		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Model/$name");
 		$modelPath = "$this->appDir/Model/Orm.php";
 		$this->createFile($modelPath, $generator->generateUpdatedModel($modelPath));
+	}
+
+
+	public function getEntityComments(Table $table, ?string $module = null): ?string
+	{
+		$name = $table->getPhpName();
+		$generator = new ModelGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module,
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Model";
+		$entityPath = "$basePath/$name/$name.php";
+		return $generator->getEntityComments($entityPath, $table);
 	}
 
 
