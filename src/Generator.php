@@ -9,7 +9,6 @@ use Nette\Application\UI\Presenter;
 use Nette\Bridges\ApplicationLatte\Template;
 use Nette\PhpGenerator\PhpFile;
 use Nette\Utils\FileSystem;
-use Nextras\Dbal\Platforms\Data\ForeignKey;
 use Nextras\Orm\Entity\Entity;
 use Nextras\Orm\Mapper\Mapper;
 use Nextras\Orm\Repository\Repository;
