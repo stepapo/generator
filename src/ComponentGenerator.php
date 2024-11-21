@@ -145,7 +145,8 @@ class ComponentGenerator
 			->addMember($createMethod);
 
 		$namespace = (new PhpNamespace($this->namespace))
-			->add($class);
+			->add($class)
+			->addUse(Factory::class);
 
 		if ($this->entityName) {
 			$createMethod

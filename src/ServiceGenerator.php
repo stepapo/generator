@@ -32,7 +32,8 @@ class ServiceGenerator
 			->addMember((new Method('__construct'))->setPublic());
 
 		$namespace = (new PhpNamespace("{$this->namespace}"))
-			->add($class);
+			->add($class)
+			->addUse(Service::class);
 
 		$file = (new PhpFile())->setStrictTypes();
 		$file->addNamespace($namespace);

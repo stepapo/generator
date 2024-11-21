@@ -34,7 +34,8 @@ class CommandGenerator
 			->addMember((new Method('run'))->setPublic()->setReturnType('int')->setBody('return 0;'));
 
 		$namespace = (new PhpNamespace("{$this->namespace}"))
-			->add($class);
+			->add($class)
+			->addUse(Command::class);
 
 		$file = (new PhpFile())->setStrictTypes();
 		$file->addNamespace($namespace);
