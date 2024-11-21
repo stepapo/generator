@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Stepapo\Generator;
 
-use App\Model\Activity\Activity;
 use Nette\Application\UI\Form;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\InterfaceType;

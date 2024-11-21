@@ -72,5 +72,21 @@ $generator->createService(
 );
 ```
 
+### Command
+
+```php
+$options = getopt(null, ['appNamespace:', 'appDir:', 'name:', 'module:']);
+
+$generator = new Stepapo\Generator\Generator(
+	appNamespace: $options['appNamespace'] ?? 'App',
+	appDir: __DIR__ . '/../' . ($options['appDir'] ?? 'app'),
+);
+
+$generator->createCommand(
+	name: $options['name'],
+	module: $options['module'] ?? null,
+);
+```
+
 
 

@@ -223,6 +223,26 @@ class Generator
 	}
 
 
+	public function createCommand(
+		string $name,
+		?string $module = null,
+	) {
+		$generator = new CommandGenerator(
+			name: $name,
+			appNamespace: $this->appNamespace,
+			module: $module
+		);
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Lib";
+		$this->createFile("$basePath/{$name}.php", $generator->generateCommand());
+	}
+
+
+	public function removeCommand(string $name, ?string $module)
+	{
+		FileSystem::delete("$this->appDir/" . ($module ? "Module/$module/" : '') . "Command/$name.php");
+	}
+
+
 	protected function createFile(string $path, PhpFile|string|null $file = null): void
 	{
 		FileSystem::write($path, $file instanceof PhpFile ? (new CustomPrinter())->printFile($file) : (string) $file, mode: null);
