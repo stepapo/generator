@@ -22,7 +22,7 @@ class CommandGenerator
 		private string $appNamespace,
 		private ?string $module = null,
 	) {
-		$this->namespace = $this->appNamespace . ($this->module ? "\Module\\{$this->module}" : '') . "\Lib";
+		$this->namespace = $this->appNamespace . ($this->module ? "\Module\\{$this->module}" : '') . "\Command";
 	}
 
 

@@ -232,7 +232,7 @@ class Generator
 			appNamespace: $this->appNamespace,
 			module: $module
 		);
-		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Lib";
+		$basePath = "$this->appDir/" . ($module ? "Module/{$module}/" : '') . "Command";
 		$this->createFile("$basePath/{$name}.php", $generator->generateCommand());
 	}
 
