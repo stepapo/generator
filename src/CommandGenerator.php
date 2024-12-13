@@ -9,7 +9,6 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Stepapo\Utils\Command\Command;
-use Stepapo\Utils\Service;
 
 
 class CommandGenerator
