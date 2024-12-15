@@ -14,7 +14,7 @@
 		"issues": "https://github.com/stepapo/generator/issues"
 	},
 	"require": {
-		"php": ">=8.1",
+		"php": ">=8.3",
 		"nette/application": "^3.2",
 		"nette/php-generator": "^4.0",
 		"nette/utils": "^4.0",
