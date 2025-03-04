@@ -11,6 +11,7 @@ use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\Utils\ArrayHash;
+use Nette\Utils\Arrays;
 use Stepapo\Dataset\Control\Dataset\DatasetControl;
 use Stepapo\Menu\UI\Menu;
 use Stepapo\Utils\Factory;
@@ -25,21 +26,20 @@ class ComponentGenerator
 	private string $lname;
 	private string $namespace;
 	private string $lentityName;
-	private string $entity;
 
 
 	public function __construct(
 		private string $name,
 		private string $appNamespace,
 		private ?string $module = null,
-		private ?string $entityName = null,
+		private ?string $entity = null,
 		private bool $withTemplateName = false,
 		private ?string $type = null,
 		private ?string $factory = null,
 	) {
-		if ($this->entityName) {
-			$this->lentityName = lcfirst($this->entityName);
-			$this->entity = "{$this->appNamespace}\Model\\{$this->entityName}\\{$this->entityName}";
+		if ($this->entity) {
+			$parts = explode('\\', $this->entity);
+			$this->lentityName = lcfirst(Arrays::last($parts));
 		}
 		$this->lname = lcfirst($name);
 		$this->namespace = $this->appNamespace . ($this->module ? "\Module\\{$this->module}" : '') . "\Control\\{$this->name}";
@@ -55,7 +55,7 @@ class ComponentGenerator
 			->addUse($base)
 			->add($class);
 
-		if ($this->entityName) {
+		if ($this->entity) {
 			$class->addProperty($this->lentityName)
 				->setPublic()
 				->setType($this->entity);
@@ -87,7 +87,7 @@ class ComponentGenerator
 			->addUse($base)
 			->add($class);
 
-		if ($this->entityName) {
+		if ($this->entity) {
 			$constructMethod
 				->addPromotedParameter($this->lentityName)
 				->setPrivate()
@@ -148,7 +148,7 @@ class ComponentGenerator
 			->add($class)
 			->addUse(Factory::class);
 
-		if ($this->entityName) {
+		if ($this->entity) {
 			$createMethod
 				->addParameter($this->lentityName)
 				->setType($this->entity);

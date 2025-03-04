@@ -56,7 +56,7 @@ class Generator
 	public function createComponent(
 		string $name,
 		?string $module = null,
-		?string $entityName = null,
+		?string $entity = null,
 		bool $withTemplateName = false,
 		string $type = null,
 		string $factory = null,
@@ -67,7 +67,7 @@ class Generator
 			name: $name,
 			appNamespace: $this->appNamespace,
 			module: $module,
-			entityName: $entityName,
+			entity: $entity,
 			withTemplateName: $withTemplateName,
 			type: $type,
 			factory: $factory,
